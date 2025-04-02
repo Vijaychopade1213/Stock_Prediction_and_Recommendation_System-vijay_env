@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% if theme == "dark" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}">
+    {% endif %} -->
+    <!-- <link rel="stylesheet" href="/Templates/style.css">
+    <link rel="stylesheet" href="/static/Style.css">
+    <link rel="stylesheet" href="/static/dark.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            background-color: #ecf2ff; /* Very light, calming background */
+            color: #2c3e50; /* Deep, professional text color */
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1450px; /* Adjusted max-width for better readability */
+            width: 100%;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #ffffff; /* Clean white container */
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .container_1 {
+            display: flex;
+            justify-content: space-between;
+            width: fit-content;
+        }
+
+        h1 {
+            color: #1e3799; /* Strong, trustworthy blue */
+            text-align: center;
+            align-items: center;
+            font-size: 2.5em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-bottom: 10px;
+            position: relative;
+            left: 50%;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            height: 4px;
+            width: 50px;
+            background-color: #4a69bd; /* Slightly darker blue accent */
+            border-radius: 2px;
+        }
+
+        /* Form Styles */
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f7fa; /* Even lighter form background */
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.05);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #535c68; /* Darker, sophisticated label text */
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da; /* Muted border */
+            border-radius: 7px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            color: #34495e;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4a69bd; /* Blue accent on focus */
+            outline: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group label {
+            margin: 5px 10px;
+            display: flex;
+            align-items: center;
+            color: #535c68; /* Darker checkbox labels */
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            width: auto;
+            height: 1.2em;
+        }
+
+        input[type="submit"],
+        .toggle-btn {
+            background-color: #4a69bd; /* Primary blue */
+            color: #fff;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: block;
+            margin: 10px auto;
+            width: fit-content;
+        }
+
+        input[type="submit"]:hover,
+        .toggle-btn:hover {
+            background-color: #384cae; /* Darker blue on hover */
+            transform: scale(1.03);
+        }
+
+        .stock-info-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Stock Info Styles */
+        .stock-info {
+            background-color: #ffffff; /* Clean white */
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef; /* Very light border */
+            color: #2c3e50;
+            display:flexbox;
+        }
+
+        .stock-info h2 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: #1e3799;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+
+        .stock-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .stock-info li {
+            margin-bottom: 8px;
+        }
+
+        .stock-info strong {
+            font-weight: 600;
+            color: #535c68;
+        }
+
+        .recommendation {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+            display: block;
+        }
+
+        .recommendation i {
+            margin-left: 5px;
+            color: inherit;
+        }
+
+        /* Chart Styles */
+        .chart {
+            overflow-x: auto;
+            width: auto;
+            height: fit-content;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        .chart:hover {
+            transform: translateY(-3px);
+        }
+
+        .chart h2 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: #1e3799;
+            padding: 20px;
+            background-color: #f5f7fa;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 500;
+        }
+
+        /* Dataframe Styles */
+        .dataframe {
+            overflow-x: auto;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: #34495e;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        th {
+            background-color: #f5f7fa;
+            color: #1e3799;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Theme Toggle Button Style */
+        /* .toggle-btn {
+            align-self: center;
+            margin-top: 20px;
+        }
+
+        .toggle-container {
+            margin-left: 10px;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+
+        .toggle-button {
+            width: fit-content;
+            height: 50px;
+            padding: 8px 16px;
+            background-color: #ccd0d4; /* Neutral button color */
+            /* border-radius: 10px;
+            position: relative;
+            left: 90%;
+            bottom: -50%;
+            cursor: pointer;
+            margin: 15px;
+            color: #2c3e50;
+            border: none;
+            transition: background-color 0.3s ease;
+        }  */
+
+        /* .toggle-button:hover {
+            background-color: #b1b5ba; /* Slightly darker on hover */
+        /* } */
+
+        .buy-recommendation {
+            color: #2ecc71; /* Classic green */
+        }
+
+        .sell-recommendation {
+            color: #e74c3c; /* Classic red */
+        }
+
+        .hold-recommendation {
+            color: #f39c12; /* Gold/Amber */
+        }
+
+        /* Live Market Data Styles */
+        .live-market-data {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .live-market-data h2 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #1e3799;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 5px;
+        }
+
+        .live-market-data p {
+            margin: 5px 0;
+            color: #535c68;
+        }
+
+        .live-market-data ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .live-market-data li {
+            margin: 3px 0;
+        }
+
+        /* Definitions Styles */
+        .definitions {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .definitions h2 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #1e3799;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 5px;
+        }
+
+        .definitions p {
+            margin: 5px 0;
+            color: #535c68;
+        }
+
+        /* Nifty Widgets */
+        .nifty-widgets {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+        }
+
+        .nifty-widget {
+            background-color: #f5f7fa;
+            border: 1px solid #e9ecef;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .nifty-widget span {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+            font-weight: 500;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+    <!-- <script>
+        function fetchNiftyData() {
+            fetch('/nifty-data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('nifty-50-price').innerText = data.nifty_50;
+                    document.getElementById('nifty-bank-price').innerText = data.nifty_bank;
+                });
+        }
+        setInterval(fetchNiftyData, 5000);  // Refresh every 5 sec
+        fetchNiftyData();
+    </script> -->
+</head>
+
+<body>
+    <div class="container">
+        <!-- <div class="toggle-container">
+            <form method="POST">
+                <button class="toggle-button" type="submit">
+                    {% if theme == "dark" %}
+                    ☀️ Light Mode
+                    {% else %}
+                    🌙 Dark Mode
+                    {% endif %}
+                </button>
+            </form>
+        </div> -->
+        <div class="container_1">
+            <h1>Stock Market Recommendation</h1>
+        </div>
+
+        <!-- Live Market Data -->
+        <!-- <div class="live-market-data">
+            <h2>Live Indices</h2>
+            <p>Nifty 50: <span id="nifty-50-price">Loading...</span></p>
+            <p>Bank Nifty: <span id="nifty-bank-price">Loading...</span></p>
+
+            <h2>Top 5 Performers</h2>
+            <ul>
+                {% for stock, price in top_performers %}
+                <li>{{ stock }}: {{ price }}</li>
+                {% endfor %}
+            </ul>
+
+            <h2>Top 5 Losers</h2>
+            <ul>
+                {% for stock, price in top_losers %}
+                <li>{{ stock }}: {{ price }}</li>
+                {% endfor %}
+            </ul>
+        </div> -->
+
+        <!-- Search Container -->
+        <div class="search-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+            <form method="post">
+                <label for="symbol">Enter Stock Symbol:</label>
+                <input type="text" id="symbol" name="symbol" required>
+
+                <div class="checkbox-group">
+                    <label for="all">
+                        <input type="checkbox" id="all" name="indicators" value="all"> All
+                    </label>
+
+                    <label for="rsi"
+                        title="Relative Strength Index: Measures momentum to indicate overbought or oversold conditions.">
+                        <input type="checkbox" id="rsi" name="indicators" value="rsi"> RSI
+                    </label>
+
+                    <label for="macd"
+                        title="Moving Average Convergence Divergence: Identifies trend direction and strength.">
+                        <input type="checkbox" id="macd" name="indicators" value="macd"> MACD
+                    </label>
+
+                    <label for="sma" title="Simple Moving Average: Shows the average price over a set period.">
+                        <input type="checkbox" id="sma" name="indicators" value="sma"> SMA
+                    </label>
+
+                    <label for="ema"
+                        title="Exponential Moving Average: Gives more weight to recent price data.">
+                        <input type="checkbox" id="ema" name="indicators" value="ema"> EMA
+                    </label>
+                </div>
+
+                <input type="submit" value="Analyze">
+            </form>
+
+            <!-- Definitions Section -->
+            <div class="definitions">
+                <h2>Key Technical Indicators for Market Analysis :</h2>
+                <p><strong>RSI (Relative Strength Index):</strong> Measures momentum to indicate overbought or oversold
+                    conditions.</p>
+                <p><strong>MACD (Moving Average Convergence Divergence):</strong> Identifies trend direction and strength.</p>
+                <p><strong>SMA (Simple Moving Average):</strong> Shows the average price over a set period.</p>
+                <p><strong>EMA (Exponential Moving Average):</strong>A type of moving average that gives more weight to recent prices, making it more responsive to new information.</p>
+            </div>
+            <p>{{ stock_info }}</p>
+                {% if aggregated_price %}
+                <p><b>Aggregated Predicted Price:</b> {{ aggregated_price }}</p>
+                {% endif %}
+                {% if recommendation %}
+                <p class="recommendation {% if 'BUY' in recommendation %}buy-recommendation{% elif 'SELL' in recommendation %}sell-recommendation{% elif 'HOLD' in recommendation %}hold-recommendation{% endif %}">
+                    <b>Recommendation:</b> {{ recommendation|safe }}
+                    {% if "BUY" in recommendation %}
+                    <i class="fas fa-thumbs-up"></i>
+                    {% elif "SELL" in recommendation %}
+                    <i class="fas fa-thumbs-down"></i>
+                    {% else %}
+                    <i class="fas fa-question"></i>
+                    {% endif %}
+                </p>
+                {% endif %}
+        </div>
+
+        <!-- Stock Info Container -->
+        <div class="stock-info-container">
+            {% if stock_info %}
+            <div class="stock-info">
+                <h2>Stock Information:</h2>
+                <ul>
+                    <li><strong>Company Name:</strong> {{ info.get('longName', 'N/A') }}</li>
+                    <li><strong>Stock Price:</strong> {{ info.get('currentPrice', 'N/A') }}</li>
+                    <li><strong>Market Cap:</strong> {{ info.get('marketCap', 'N/A') }}</li>
+                    <li><strong>P/E Ratio:</strong> {{ info.get('trailingPE', 'N/A') }}</li>
+                    <li><strong>Sector:</strong> {{ info.get('sector', 'N/A') }}</li>
+                    <li><strong>Industry:</strong> {{ info.get('industry', 'N/A') }}</li>
+                    <li><strong>52 Week High:</strong> {{ info.get('fiftyTwoWeekHigh', 'N/A') }}</li>
+                    <li><strong>52 Week Low:</strong> {{ info.get('fiftyTwoWeekLow', 'N/A') }}</li>
+                    <li><strong>Volume:</strong> {{ info.get('volume', 'N/A')}}</li>
+                    <li><strong>Low:</strong> {{ info.get('low', 'N/A')}}</li>
+                    <li><strong>Previous Close:</strong> {{ info.get('previousClose', 'N/A')}}</li>
+                </ul>
+                {% if candlestick_chart_html %}
+                <div class="chart">
+                    <h2>Candlestick Chart:</h2>
+                    {{ candlestick_chart_html | safe }}
+                </div>
+                {% endif %}
+        
+                <div class="dataframe-container">
+                    {% if dataframe %}
+                    <div class="dataframe">
+                        <h2>First 10 Rows:</h2>
+                        {{ dataframe | safe }}
+                    </div>
+                    {% endif %}
+
+                    {% if dataframe_last %}
+                    <div class="dataframe_last">
+                        <h2>Last 10 Rows:</h2>
+                        {{ dataframe_last | safe }}
+                    </div>
+                    {% endif %}
+                </div>
+                <!-- <p>{{ stock_info }}</p>
+                {% if aggregated_price %}
+                <p><b>Aggregated Predicted Price:</b> {{ aggregated_price }}</p>
+                {% endif %}
+                {% if recommendation %}
+                <p class="recommendation {% if 'BUY' in recommendation %}buy-recommendation{% elif 'SELL' in recommendation %}sell-recommendation{% elif 'HOLD' in recommendation %}hold-recommendation{% endif %}">
+                    <b>Recommendation:</b> {{ recommendation|safe }}
+                    {% if "BUY" in recommendation %}
+                    <i class="fas fa-thumbs-up"></i>
+                    {% elif "SELL" in recommendation %}
+                    <i class="fas fa-thumbs-down"></i>
+                    {% else %}
+                    <i class="fas fa-question"></i>
+                    {% endif %}
+                </p> -->
+                <!-- {% endif %} -->
+                <!-- {% if base_stock %}
+                <div class="similar-stocks">
+                    <h2>Similar Stocks to {{ base_stock }}</h2>
+                    {% if correlated_stocks is not none %}
+                        {% for stock, correlation in correlated_stocks.items() %}
+                            <p>{{ stock }}: {{ correlation }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p>No correlated stocks found.</p>
+                    {% endif %}
+                </div>
+                {% endif %} -->
+                {% if news_articles %}
+                <div class="news-section">
+                    <h2>Stock News:</h2>
+                    {% if news_articles %}
+                    <ul>
+                        {% for article in news_articles %}
+                            <li>
+                                <a href="{{ article.url }}" target="_blank">
+                                    {{ article.title }}
+                                </a>
+                                <p>{{ article.description }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No news articles found for this stock.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Charts and Dataframe -->
+        <!-- {% if candlestick_chart_html %}
+        <div class="chart">
+            <h2>Candlestick Chart:</h2>
+            {{ candlestick_chart_html | safe }}
+        </div>
+        {% endif %} -->
+
+        {% if chart_html %}
+        <div class="chart">
+            <h2>Price Chart:</h2>
+            {{ chart_html | safe }}
+        </div>
+        {% endif %}
+
+        {% if all_charts_html %}
+        <div class="chart">
+            <h2>All Charts:</h2>
+            {{ all_charts_html | safe }}
+        </div>
+        {% endif %}
+
+        {% if indicator_chart_html %}
+        <div class="chart">
+            <h2>Indicator Charts:</h2>
+            {{ indicator_chart_html | safe }}
+        </div>
+        {% endif %}
+
+    </div>
+    
+</body>
+
+</html>

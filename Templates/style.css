@@ -1,0 +1,89 @@
+:root {
+    --bg-light: #fff;
+    --text-light: #000;
+    --bg-dark: #333;
+    --text-dark: #fff;
+    --container-bg-light: #f9f9f9;
+    --container-bg-dark: #444;
+    --table-header-bg-light: #f2f2f2;
+    --table-header-bg-dark: #555;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--bg-light); /* Default to light theme */
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+}
+
+/* Dark Theme Override */
+body.dark-theme {  /* Use a class on the body to trigger dark theme */
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+.container {
+    width: 95%;
+    margin: 20px auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#theme-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
+
+#stock-form, .chart-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--container-bg-light); /* Default to light */
+}
+
+body.dark-theme #stock-form,
+body.dark-theme .chart-container {
+    background-color: var(--container-bg-dark);
+}
+
+.data {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data th, .data td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.data th {
+    background-color: var(--table-header-bg-light);  /* Default to light */
+}
+
+body.dark-theme .data th {
+    background-color: var(--table-header-bg-dark);
+}
+
+/* Grid layout for charts */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); /* Adjust minmax as needed */
+    gap: 20px;
+}
+
+.chart {
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--container-bg-light); /* Default to light */
+}
+
+body.dark-theme .chart {
+    background-color: var(--container-bg-dark);
+}

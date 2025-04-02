@@ -1,0 +1,18 @@
+body {
+    background-color: #ffffff;
+    color: #95ccfb;
+    font-family: Arial, sans-serif;
+}
+.container {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+}
+.toggle-btn {
+    padding: 10px 20px;
+    cursor: pointer;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
